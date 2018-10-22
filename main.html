@@ -1,0 +1,84 @@
+
+<html>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<body>
+<div>Film Suche:<input type="text" id="suche" name="table" maxlength="64" size="30" required="required"></div>
+<div id="results"></div>
+<script>
+
+$(document).ready(function() {
+	$('#suche').keyup(function() {
+
+		var searchString = $('#suche').val();
+		if (searchString.length > 0) {
+			searchByTitle(searchString);
+		}
+	});
+
+
+});
+
+function getMovieOMDB(searchString){
+
+	$.getJSON('http://www.omdbapi.com/?apikey=b0d26e30&t='+searchString, function(data){
+		console.log(data);
+		displayResult(data.Title);
+		var $button = $("<button>Add</button>");
+		$button.click(function(){
+			addMovie(data);
+		});
+		$('#results').append($button);
+	});
+}
+
+function addMovie(data){
+		$.ajax({
+  		type : "POST",
+  		headers: {
+  		 	'Content-Type': 'application/x-www-form-urlencoded'
+  		},
+  		url: "http://localhost/main.php",
+  		data: JSON.stringify(data),
+  		dataType: 'json',
+  		complete: function(jqXHR){
+  					console.log(jqXHR);
+
+  					// if (jqXHR.status == 200) {
+  					// 	displayResult("DB RESULT: " + jqXHR.responseText);
+  					// }
+  					// if (jqXHR.status == 404) {
+  					// 	getMovieOMDB(searchString);
+  					// }
+  				}
+	});
+}
+function displayResult(result){
+	$('#results').empty();
+	$('#results').append(result);
+}
+
+function searchByTitle(searchString){
+
+	$.ajax({
+  		type : "POST",
+  		url: "http://localhost/main.php",
+  		data: {'title': searchString},
+  		dataType: 'json',
+  		complete: function(jqXHR){
+  					console.log(jqXHR.status);
+  					console.log("searchByTitle");
+  					if (jqXHR.status == 200) {
+  						displayResult("DB RESULT: " + jqXHR.responseText);
+  					}
+  					if (jqXHR.status == 404) {
+  						getMovieOMDB(searchString);
+  					}
+  				}
+	});
+}
+
+
+</script>
+
+</body>
+</html>
