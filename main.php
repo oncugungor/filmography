@@ -13,6 +13,9 @@ $db = connectDB();
 $content = file_get_contents("php://input");
 
 if(isset($_POST['title'])) {
+	if ($_POST['title'] == "mymovies") {
+		getMovies();
+	} else
 	searchMovieInDatabase($_POST['title']);
 } else {
 	addMovieToDatabase($content);
@@ -20,11 +23,11 @@ if(isset($_POST['title'])) {
 
 function searchMovieInDatabase($content){
 	
-	$sql = "SELECT * FROM `movies` WHERE title='" . $content . "'";
+	$sql = "SELECT * FROM `movies` WHERE title= '" . $content . "'";
 	$result = $GLOBALS['db']->query($sql);
 	$empty = True;
 	while ($row = mysqli_fetch_array($result)) {
-		echo $row['country'] . ' ' . $row['year'];
+		echo $row['title'];
 		$empty = False;
 	}
 	//send 404 if movie not exists in DB
@@ -39,7 +42,7 @@ function addMovieToDatabase($content){
 
     $data = json_decode($content, true);
     
-	$sql = "INSERT INTO movies (title, year) VALUES ('" . $data['Title']. "','" . $data['Year'] ."')";
+	$sql = "INSERT INTO movies (title, year, runtime, country) VALUES ('" . $data['Title']. "','" . $data['Year'] ."','" . $data['Runtime'] ."','" . $data['Country'] ."')";
 	 if ($GLOBALS['db']->query($sql) === TRUE) {
 	 	    echo "New record created successfully";
 	 } else {
@@ -47,4 +50,22 @@ function addMovieToDatabase($content){
 		}
 }
 
+function getMovies(){
+
+	$sql = "SELECT * FROM `movies`";
+	$result = $GLOBALS['db']->query($sql);
+	$empty = True;
+	header('Content-Type: application/json');
+	$movie = array();
+	while($row = $result->fetch_array(MYSQL_ASSOC)) {
+            $movie[] = $row;
+            $empty = False;
+    }
+    echo json_encode($movie);
+	
+	//send 404 if no movie exists in DB
+	if ($empty) {
+		http_response_code(404);
+	}
+}
 ?>

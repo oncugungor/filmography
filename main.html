@@ -1,84 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<html>
-<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-<body>
-<div>Film Suche:<input type="text" id="suche" name="table" maxlength="64" size="30" required="required"></div>
-<div id="results"></div>
-<script>
-
-$(document).ready(function() {
-	$('#suche').keyup(function() {
-
-		var searchString = $('#suche').val();
-		if (searchString.length > 0) {
-			searchByTitle(searchString);
-		}
-	});
-
-
-});
-
-function getMovieOMDB(searchString){
-
-	$.getJSON('http://www.omdbapi.com/?apikey=b0d26e30&t='+searchString, function(data){
-		console.log(data);
-		displayResult(data.Title);
-		var $button = $("<button>Add</button>");
-		$button.click(function(){
-			addMovie(data);
-		});
-		$('#results').append($button);
-	});
-}
-
-function addMovie(data){
-		$.ajax({
-  		type : "POST",
-  		headers: {
-  		 	'Content-Type': 'application/x-www-form-urlencoded'
-  		},
-  		url: "http://localhost/main.php",
-  		data: JSON.stringify(data),
-  		dataType: 'json',
-  		complete: function(jqXHR){
-  					console.log(jqXHR);
-
-  					// if (jqXHR.status == 200) {
-  					// 	displayResult("DB RESULT: " + jqXHR.responseText);
-  					// }
-  					// if (jqXHR.status == 404) {
-  					// 	getMovieOMDB(searchString);
-  					// }
-  				}
-	});
-}
-function displayResult(result){
-	$('#results').empty();
-	$('#results').append(result);
-}
-
-function searchByTitle(searchString){
-
-	$.ajax({
-  		type : "POST",
-  		url: "http://localhost/main.php",
-  		data: {'title': searchString},
-  		dataType: 'json',
-  		complete: function(jqXHR){
-  					console.log(jqXHR.status);
-  					console.log("searchByTitle");
-  					if (jqXHR.status == 200) {
-  						displayResult("DB RESULT: " + jqXHR.responseText);
-  					}
-  					if (jqXHR.status == 404) {
-  						getMovieOMDB(searchString);
-  					}
-  				}
-	});
-}
-
-
-</script>
-
-</body>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
+    <style>
+      .card {
+        text-align: center;
+        margin: 0 auto; 
+        float: none;
+        margin-bottom: 10px;
+      }
+      img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 22%;
+      }
+    </style>
+    <title>My Filmography</title>
+  </head>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <script type="text/javascript" src="/Users/NcGnGR-Mobil/Desktop/FdB/movie.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+  <body>
+    <div class="input-group">
+      <input type="text" id="searchBox" class="form-control" placeholder="Search Movie" aria-describedby="button-addon1">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" title="List of movies in database" type="button" id="button-addon2" onClick="getMovies()">My Movies</button>
+      </div>
+    </div>
+    <div class="card" id="container"></div>  
+  </body>
 </html>
